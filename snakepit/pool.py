@@ -10,5 +10,5 @@ class Pool(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def getClient(self, endpoint):
+    def call(self, peer, callName, *args, **kwargs):
         pass

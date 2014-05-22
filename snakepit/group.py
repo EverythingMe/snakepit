@@ -45,6 +45,6 @@ class Group(object):
         if peer == self.localEndpoint():
             return self._handler.do(callName, *args, **kwargs)
         else:
-            return self._pool.getClient(peer).call(callName, *args, **kwargs)
+            return self._pool.call(peer, callName, *args, **kwargs)
 
 
