@@ -21,7 +21,7 @@ class ServerTransport(object):
         return self._endpoint
 
     @abc.abstractmethod
-    def listen(cls, addr, handler):
+    def listen(self):
         pass
 
 class ClientTransport(object):
