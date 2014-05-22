@@ -1,6 +1,6 @@
 import logging
 
-from kazoo.client import KazooClient
+from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import NodeExistsError
 
 from snakepit.registry import Registry
@@ -10,8 +10,6 @@ __author__ = 'nati'
 
 
 class ZKRegistry(Registry):
-    # TODO: handle edge cases where _endpoints might get diverged on disconnections
-
     def __init__(self, name, hosts):
         """
         :param name: Registry name
@@ -38,10 +36,20 @@ class ZKRegistry(Registry):
         """
         self._client = KazooClient(hosts=self._hosts)
         self._client.start()  # TODO: handle exceptions
+        self._client.add_listener(self._stateListener)
         self._client.ensure_path(self._registryPath)  # TODO: handle exceptions
-        self._client.get_children(self._registryPath, watch=self._watcher)
         self._watcher = self._client.ChildrenWatch(self._registryPath, func=self._childrenWatch)
         self._endpoints = set(self._client.get_children(self._registryPath))
+
+    def _stateListener(self, state):
+        """
+        Handle cases where the connection to ZooKeeper disconnects, and the children update
+        :param state: the current KazooState
+        """
+        if state == KazooState.CONNECTED:
+            newChildren = set(self._client.get_children(self._registryPath))
+            if self._endpoints != newChildren:
+                self._childrenWatch(newChildren)
 
     def _childrenWatch(self, children):
         """

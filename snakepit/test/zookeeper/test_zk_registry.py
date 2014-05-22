@@ -10,7 +10,7 @@ class ZKRegistryTestCase(TestCase):
     def setUp(self):
         self.registryArgs = ('testRegistry', 'localhost:2181')
         self.endpointPair = '1.2.3.4:31337'
-        self.endpointPair2 = '1.2.3.4:31337'
+        self.endpointPair2 = '1.2.3.4:1337'
         self.zookeeperSyncTime = 3
 
         self.registry = ZKRegistry(*self.registryArgs)
@@ -32,13 +32,17 @@ class ZKRegistryTestCase(TestCase):
         watchCalled = []  # using array to avoid the missing 'nonlocal' in Python 2.7
 
         def watcher(children):
+            if not watchCalled:
+                self.assertIn(self.endpointPair, children)
+            else:
+                self.assertIn(self.endpointPair2, children)
             watchCalled.append(True)
-            self.assertIn(self.endpointPair, children)
         self.registry.watch(watcher)
         self.assertFalse(watchCalled)
         self.registry.register(self.endpointPair)
         time.sleep(self.zookeeperSyncTime)
         self.assertTrue(watchCalled)
+        self.registry.register(self.endpointPair2)
 
     def testMultipleEndpoints(self):
         self.registry.register(self.endpointPair)
