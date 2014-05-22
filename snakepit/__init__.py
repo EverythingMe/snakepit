@@ -1,68 +1,44 @@
-__author__ = 'dvirsky'
-
-from collections import namedtuple
-
-class Node(object):
-
-
-    pass
-
-
-
-class Handler(object):
-
-    def do(self, callName, *args, *kwargs):
-        pass
-
-import hash_ring
+from __future__ import absolute_import
 from hashlib import md5
 
+import hash_ring
+
+
+__author__ = 'dvirsky'
 
 
 class Pool(object):
-
     def call(self, peer, callName, *args, **kwargs):
         pass
 
 
-
-class Group(object):
-
+class Node(object):
     def __init__(self, endpoint, registry, pool, handler):
-
         self._handler = handler
         self._endpoint = endpoint
         self._pool = pool
         self._registry = registry
         self._ring = None
 
-
     def start(self):
-
         self.listen()
         self._registry.register(self._endpoint)
         self._ring = hash_ring.HashRing(self._registry.getNodes())
         self._registry.watch(self._onPeersChange)
 
-
     def _onPeersChange(self, endpoints):
         pass
 
     def _makeKey(self, callName, *args, **kwargs):
-
         return md5('::'.join((callName, args, tuple(sorted(kwargs.items()))))).hexdigest()
 
-
     def _getPeer(self, key):
-
-        return self.ring.get_node(key)
+        return self._ring.get_node(key)
 
     def do(self, callName, args, kwargs):
-
         key = self._makeKey(callName, *args, **kwargs)
 
         peer = self._getPeer(key)
-
 
         if peer == self._endpoint:
             return getattr(self._handler, callName)(*args, **kwargs)
@@ -70,23 +46,20 @@ class Group(object):
             return self._pool.call(peer, callName, *args, **kwargs)
 
     def listen(self):
-
         raise NotImplementedError("PLEASE IMPLEMENT ME KTXBAI")
 
 
-
 class Registry(object):
-
     def __init__(self, name):
         self._name = name
-        self._nodes = []
+        self._endpoints = set()
 
-    def getNodes(self):
+    def getEnpoints(self):
         """
-        Return all the nodes in the registry
+        Return all the endpoints in the registry
         :return: a list of endpoint strings
         """
-        return tuple(self._nodes)
+        return tuple(sorted(self._endpoints))
 
     def register(self, endpoint):
         """
@@ -97,8 +70,6 @@ class Registry(object):
 
         raise NotImplementedError()
 
-
-
     def watch(self, callback):
         """
         Start watching the registry for changes, with a watch callback
@@ -106,3 +77,7 @@ class Registry(object):
         """
         raise NotImplementedError()
 
+
+class StaticRegistry(Registry):
+    def register(self, endpoint):
+        self._endpoints.add(endpoint)
