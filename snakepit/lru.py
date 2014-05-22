@@ -48,7 +48,6 @@ def init():
     global _nodes
     port = random.randint(1,1000000)
     ep = "localhost:%d" % port
-    print ep
     server = MockServer(ep, __handler)
     group = Group(server,__registry,__pool)
     group.start()

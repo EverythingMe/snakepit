@@ -37,13 +37,9 @@ class Group(object):
         return self._server.endpoint
 
     def do(self, callName, *args, **kwargs):
-
-
         key = self._hashFunc(callName, *args, **kwargs)
 
         peer = self._getPeer(key)
-
-        print self.localEndpoint(), callName, args, kwargs, peer
 
         if peer == self.localEndpoint():
             return self._handler.do(callName, *args, **kwargs)
