@@ -12,7 +12,7 @@ class Registry(object):
         self._name = name
         self._endpoints = set()
 
-    def getEnpoints(self):
+    def getEndpoints(self):
         """
         Return all the endpoints in the registry
         :return: a list of endpoint strings
@@ -48,7 +48,7 @@ class StaticRegistry(Registry):
         self._endpoints.add(endpoint)
         logging.info("Added node %s, registry state now: %s", endpoint, self._endpoints)
 
-        eps = self.getEnpoints()
+        eps = self.getEndpoints()
         for watcher in self._watchers:
             watcher(eps)
 

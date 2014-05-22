@@ -16,7 +16,7 @@ class Group(object):
     def start(self):
         self._server.listen()
         self._registry.register(self.localEndpoint())
-        self._ring = hash_ring.HashRing(self._registry.getEnpoints())
+        self._ring = hash_ring.HashRing(self._registry.getEndpoints())
         self._registry.watch(self._onPeersChange)
 
     def _onPeersChange(self, endpoints):
