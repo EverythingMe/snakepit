@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-
+import logging
 import hash_ring
 from hashlib import md5
 
@@ -23,7 +23,7 @@ class Group(object):
         self._registry.watch(self._onPeersChange)
 
     def _onPeersChange(self, endpoints):
-
+        logging.info("Group %s peers changed: %s", self.localEndpoint(), endpoints)
         self._ring = hash_ring.HashRing(endpoints)
 
     def hashKey(self, callName, *args, **kwargs):
