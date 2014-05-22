@@ -1,6 +1,10 @@
 from __future__ import absolute_import
 
+import logging; logging = logging.getLogger(__name__)
+
 __author__ = 'dvirsky'
+
+
 
 
 class Registry(object):
@@ -33,5 +37,28 @@ class Registry(object):
 
 
 class StaticRegistry(Registry):
+
+
+    def __init__(self, name):
+        super(StaticRegistry,self).__init__(name)
+        self._watchers = set()
+
     def register(self, endpoint):
+
         self._endpoints.add(endpoint)
+        logging.info("Added node %s, registry state now: %s", endpoint, self._endpoints)
+
+        eps = self.getEnpoints()
+        for watcher in self._watchers:
+            watcher(eps)
+
+    def watch(self, callback):
+
+        if callback in self._watchers:
+            raise RuntimeError("watcher %s already in set" % callback)
+
+        if not callable(callable):
+            raise ValueError("Not a callable!")
+
+        self._watchers.add(callback)
+
