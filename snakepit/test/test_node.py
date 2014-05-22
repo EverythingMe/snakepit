@@ -1,6 +1,9 @@
 from __future__ import absolute_import
 
-from .. import Node, Pool, Registry
+from ..node import Node
+from ..pool import Pool
+from ..registry import StaticRegistry
+
 from unittest import TestCase
 
 __author__ = 'bergundy'
@@ -21,5 +24,6 @@ class NodeTestCase(TestCase):
         self.node = NetworklessNode('local', )
 
     def testDoLocalNode(self):
+        pass
 
 
