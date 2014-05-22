@@ -13,20 +13,20 @@ logging.basicConfig(level=0)
 
 class MockNetwork(object):
 
-    _servers = {}
+    _sockets = {}
 
     @classmethod
     def listen(cls, addr, server):
 
-        if addr in cls._servers:
+        if addr in cls._sockets:
             raise RuntimeError("Port %s already taken" % addr)
 
-        cls._servers[addr] = server
+        cls._sockets[addr] = server
 
     @classmethod
     def connect(cls, addr):
 
-        return cls._servers[addr]
+        return cls._sockets[addr]
 
 
 
@@ -50,10 +50,10 @@ class MockClient(ClientTransport):
 class LocalPool(Pool):
 
 
-    def getClient(self, endpoint):
+    def call(self, endpoint, callName, *args, **kwargs):
 
         conn = MockClient(MockNetwork.connect(endpoint))
-        return conn
+        return conn.call(callName, *args, **kwargs)
 
 
 class KVHandler(BaseHandler):

@@ -5,6 +5,9 @@ from hashlib import md5
 
 
 class Group(object):
+    """
+    The Group is the top level object that manages everything, and is called both locally and
+    """
     def __init__(self, server, registry, pool, hashFunc = None):
         self._handler = server.handler
         self._pool = pool
