@@ -1,7 +1,7 @@
 import time
 from unittest import TestCase
 
-from snakepit.zookeeeper.zk_registry import ZKRegistry
+from snakepit.zookeeper.zk_registry import ZKRegistry
 
 __author__ = 'nati'
 

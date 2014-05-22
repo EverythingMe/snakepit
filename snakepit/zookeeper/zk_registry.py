@@ -4,7 +4,7 @@ from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import NodeExistsError
 
 from snakepit.registry import Registry
-from snakepit.zookeeeper import config
+from snakepit.zookeeper import config
 
 __author__ = 'nati'
 
