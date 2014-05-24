@@ -11,6 +11,8 @@ setup(
     name='snakepit',
     author='EverythingMe',
     version='0.1',
-    packages=['snakepit', 'snakepit.zmq', 'snakepit.zmq.tornado', 'snakepit.zookeeper'],
+    packages=['snakepit',
+              'snakepit.zmq', 'snakepit.zmq.tornado',
+              'snakepit.tornado', 'snakepit.zookeeper'],
     install_requires=[str(r.req) for r in parse_requirements(requirements)]
 )
