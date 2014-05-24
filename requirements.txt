@@ -5,3 +5,4 @@ pyzmq
 pylru
 tornado
 trickle
+toro

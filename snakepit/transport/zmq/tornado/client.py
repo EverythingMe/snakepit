@@ -1,5 +1,6 @@
 from __future__ import absolute_import
-from ... import ClientTransport
+from functools import partial
+from ...transport import ClientTransport
 from zmq.eventloop import zmqstream
 from collections import deque
 from tornado.concurrent import TracebackFuture
@@ -20,7 +21,15 @@ class Client(ClientTransport):
         self._socket = self._context.socket(zmq.REQ)
         self._socket.connect('tcp://{}'.format(self._endpoint))
         self._stream = zmqstream.ZMQStream(self._socket, self._io_loop)
-        self._stream.on_recv(self._on_recv)
+        #self._stream.on_recv(self._on_recv)
+
+    def _on_msg(self, future, msg, *args):
+
+        if len(msg) != 1:
+            print len(msg)
+        res = json.loads(msg[0])
+        future.set_result(res)
+
 
     def _on_recv(self, msgs):
         for msg in msgs:
@@ -36,6 +45,6 @@ class Client(ClientTransport):
             'args': list(args),
             'kwargs': kwargs
         })
-        self._stream.send(msg)
-        self._futures.appendleft(future)
+        self._stream.send(msg, callback=lambda *args: self._on_msg(future, *args))
+        #self._futures.appendleft(future)
         return future

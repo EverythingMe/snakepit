@@ -1,7 +1,7 @@
 import logging
 
 from kazoo.client import KazooClient, KazooState
-from kazoo.exceptions import NodeExistsError
+from kazoo.exceptions import NodeExistsError, NoNodeError
 
 from snakepit.registry import Registry
 from snakepit.zookeeper import config
@@ -34,8 +34,9 @@ class ZKRegistry(Registry):
         """
         Start the ZooKeeper client, and ensure path existence
         """
-        self._client = KazooClient(hosts=self._hosts)
+        self._client = KazooClient(hosts=self._hosts, timeout=0.5)
         self._client.start()  # TODO: handle exceptions
+
         self._client.add_listener(self._stateListener)
         self._client.ensure_path(self._registryPath)  # TODO: handle exceptions
         self._watcher = self._client.ChildrenWatch(self._registryPath, func=self._childrenWatch)
@@ -56,6 +57,7 @@ class ZKRegistry(Registry):
         Update _endpoints on changes, and call the user's callback function
         """
         self._endpoints = set(children)
+        print self._endpoints
         if self._userWatcher:
             self._userWatcher(self.get_endpoints())
 
@@ -66,9 +68,16 @@ class ZKRegistry(Registry):
         """
         if isinstance(self._client, KazooClient):
             try:
+                self._client.delete(path=self._makePath(endpoint))
+            except NoNodeError:
+                pass
+            try:
                 self._client.create(path=self._makePath(endpoint), ephemeral=True)
             except NodeExistsError:
-                pass  # node already exists, nothing to do (?)
+                logging.exception("Could not register node")
+                # node already exists, nothing to do (?)
+            else:
+                print "Registered successfully"
             # TODO: handle more exceptions
         else:
             pass  # TODO: handle missing client
@@ -78,7 +87,7 @@ class ZKRegistry(Registry):
         Start watching the registry for changes, with a watch callback
         :param callback: a function in the form of f([endpoint, endpoint, ...])
         """
-        if hasattr(callback, '__call__'):
+        if callable(callback):
             self._userWatcher = callback
         else:
             raise ValueError('callback should be callable')
