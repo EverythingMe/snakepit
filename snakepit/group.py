@@ -26,7 +26,8 @@ class Group(object):
         logging.info("Group %s peers changed: %s", self.localEndpoint(), endpoints)
         self._ring = hash_ring.HashRing(endpoints)
 
-    def hashKey(self, callName, *args, **kwargs):
+    @staticmethod
+    def hashKey(callName, *args, **kwargs):
         return md5(callName + '::'.join(map(str, args + tuple(sorted(kwargs.iteritems()))))).hexdigest()
 
     def _getPeer(self, key):

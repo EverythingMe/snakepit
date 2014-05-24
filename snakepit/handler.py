@@ -1,17 +1,13 @@
-__author__ = 'dvirsky'
+from __future__ import absolute_import
 from tornado.concurrent import Future
 
+
 class BaseHandler(object):
-
-
     def do(self, callName, *args, **kwargs):
-
         return getattr(self, callName,)(*args, **kwargs)
 
 
 class AsyncHandler(BaseHandler):
-
-
     def do(self, callName, *args, **kwargs):
         res = super(AsyncHandler, self).do(callName, *args, **kwargs)
         if not isinstance(res, Future):
@@ -20,5 +16,3 @@ class AsyncHandler(BaseHandler):
             return future
         else:
             return res
-
-
