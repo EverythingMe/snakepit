@@ -4,3 +4,4 @@ backports.functools_lru_cache>=1.0
 pyzmq
 pylru
 tornado
+trickle
