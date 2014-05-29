@@ -1,50 +1,50 @@
 from __future__ import absolute_import
 import logging
 import hash_ring
-from hashlib import md5
 
 
 class Group(object):
     """
     The Group is the top level object that manages everything, and is called both locally and
     """
-    def __init__(self, server, registry, pool, hashFunc = None):
-        self._handler = server.handler
+    def __init__(self, server, registry, pool, hash_func=None):
         self._pool = pool
         self._registry = registry
         self._ring = None
-        self._hashFunc = hashFunc or self.hashKey
+        self._hash_func = hash_func or self.hash_key
         self._server = server
 
     def start(self):
         self._server.listen()
-        self._registry.register(self.localEndpoint())
-        self._ring = hash_ring.HashRing(self._registry.getEndpoints())
-        self._registry.watch(self._onPeersChange)
+        self._registry.register(self.local_endpoint())
+        self._ring = hash_ring.HashRing(self._registry.get_endpoints())
+        self._registry.watch(self._on_peers_change)
 
-    def _onPeersChange(self, endpoints):
-        logging.info("Group %s peers changed: %s", self.localEndpoint(), endpoints)
+    def stop(self):
+        self._server.stop()
+
+    def _on_peers_change(self, endpoints):
+        logging.info("Group %s peers changed: %s", self.local_endpoint(), endpoints)
         self._ring = hash_ring.HashRing(endpoints)
 
     @staticmethod
-    def hashKey(callName, *args, **kwargs):
-        return md5(callName + '::'.join(map(str, args + tuple(sorted(kwargs.iteritems()))))).hexdigest()
+    def hash_key(method, *args, **kwargs):
+        return method + '::'.join(map(str, args + tuple(sorted(kwargs.iteritems()))))
 
-    def _getPeer(self, key):
+    def _get_peer(self, key):
         return self._ring.get_node(key)
 
-    def localEndpoint(self):
-
+    def local_endpoint(self):
         return self._server.endpoint
 
-    def do(self, callName, *args, **kwargs):
-        key = self._hashFunc(callName, *args, **kwargs)
+    def do(self, method, *args, **kwargs):
+        key = self._hash_func(method, *args, **kwargs)
 
-        peer = self._getPeer(key)
+        peer = self._get_peer(key)
 
-        if peer == self.localEndpoint():
-            return self._handler.do(callName, *args, **kwargs)
+        if peer == self.local_endpoint():
+            return self._server.handle(method, *args, **kwargs)
         else:
-            return self._pool.call(peer, callName, *args, **kwargs)
+            return self._pool.call(peer, method, *args, **kwargs)
 
 

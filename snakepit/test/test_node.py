@@ -89,7 +89,7 @@ class NodeTestCase(TestCase):
             handler = KVHandler(ep)
             pool = LocalPool()
             server = MockServer(ep, handler)
-            group = Group(server, self.registry, pool, hashFunc=hashfunc)
+            group = Group(server, self.registry, pool, hash_func=hashfunc)
 
             group.start()
             self.nodes.append(group)

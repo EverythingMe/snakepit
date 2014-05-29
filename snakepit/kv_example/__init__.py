@@ -7,10 +7,9 @@ import pylru
 from hashlib import md5
 
 
-from snakepit.handler import BaseHandler
 import time
 from threading import Timer
-class KVStoreHandler(BaseHandler):
+class KVStoreHandler(object):
 
     def __init__(self, name, maxSize = 1000000):
 

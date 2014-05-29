@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from ..transport import ServerTransport
+from .. import ServerTransport
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
 from tornado import gen, concurrent
@@ -25,14 +25,14 @@ class SPConnection(object):
             try:
                 msg = json.loads(data)
                 key = msg['key']
-                callName = msg['callName']
+                method = msg['method']
                 args = msg['args']
                 kwargs = msg['kwargs']
             except (KeyError, ValueError):
                 log.error('Malformed response data: %s', data)
                 continue
             try:
-                future = self._handler.do(callName, *args, **kwargs)
+                future = self._handler(method, *args, **kwargs)
             except Exception as e:
                 log.exception('Failed to handle request: %s', key)
                 future = concurrent.TracebackFuture()
@@ -61,12 +61,23 @@ class SPServer(TCPServer):
 
 
 class Server(ServerTransport):
-    def __init__(self, endpoint, handler, io_loop=None):
+    def __init__(self, handler, endpoint=None, io_loop=None):
         self._io_loop = io_loop or IOLoop.current()
-        super(Server, self).__init__(endpoint, handler)
-        self.host, port = self.endpoint.split(':')
-        self.port = int(port)
+        self._server = None
+        super(Server, self).__init__(handler, endpoint)
 
     def listen(self):
-        self._server = SPServer(self._handler, io_loop=self._io_loop)
-        self._server.listen(self.port, self.host)
+        self._server = SPServer(self.handle, io_loop=self._io_loop)
+        self._socket.setblocking(0)
+        self._socket.listen(128)
+        self._server.add_socket(self._socket)
+
+    def stop(self):
+        self._server.stop()
+
+    @gen.coroutine
+    def handle(self, method, *args, **kwargs):
+        res = super(Server, self).handle(method, *args, **kwargs)
+        if isinstance(res, concurrent.Future):
+            res = yield res
+        raise gen.Return(res)

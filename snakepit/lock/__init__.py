@@ -164,7 +164,7 @@ def init(registry, pool):
 
     print ep
     server = MockServer(ep, LockHandler())
-    group = Group(server,registry, pool)
+    group = Group(server, registry, pool)
     group.start()
     _nodes.append(group)
     __group = group

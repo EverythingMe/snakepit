@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from ...transport import ClientTransport
+from ... import ClientTransport
 from zmq.eventloop import zmqstream
 from collections import deque
 from tornado.concurrent import TracebackFuture

@@ -1,8 +1,8 @@
 from __future__ import absolute_import
-from ..transport import ClientTransport
+from .. import ClientTransport
 from tornado import concurrent, gen
 from trickle import Trickle
-from ..group import Group
+from snakepit.group import Group
 
 import logging
 import socket
@@ -20,6 +20,8 @@ class Client(ClientTransport):
         self._connect_timeout = connect_timeout
         self._read_timeout = read_timeout
         self._reading = False
+        self._socket = None
+        self._stream = None
 
     @gen.coroutine
     def connect(self):
@@ -48,7 +50,7 @@ class Client(ClientTransport):
             if 'result' in msg:
                 future.set_result(msg['result'])
             elif 'exception' in msg:
-                future.set_exception(msg['exception'])
+                future.set_exception(Exception(msg['exception']))
             else:
                 logging.error('Response contains no `result` or `exception`: %s', msg)
 
@@ -61,8 +63,8 @@ class Client(ClientTransport):
             self._start_read_loop()
             self._reading = True
 
-    def call(self, callName, *args, **kwargs):
-        key = Group.hashKey(callName, *args, **kwargs)
+    def call(self, method, *args, **kwargs):
+        key = Group.hash_key(method, *args, **kwargs)
         if key in self._futures:
             return self._futures[key]
 
@@ -70,7 +72,7 @@ class Client(ClientTransport):
 
         msg = json.dumps({
             'key': key,
-            'callName': callName,
+            'method': method,
             'args': list(args),
             'kwargs': kwargs
         }) + '\r\n'

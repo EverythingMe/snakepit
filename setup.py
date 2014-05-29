@@ -1,7 +1,4 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 from pip.req import parse_requirements
 from os import path
 
@@ -11,8 +8,6 @@ setup(
     name='snakepit',
     author='EverythingMe',
     version='0.1',
-    packages=['snakepit',
-              'snakepit.zmq', 'snakepit.zmq.tornado',
-              'snakepit.tornado', 'snakepit.zookeeper'],
+    packages=find_packages(exclude=['*.test', '*example*']),
     install_requires=[str(r.req) for r in parse_requirements(requirements)]
 )

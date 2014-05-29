@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from ..transport import ClientTransport
+from .. import ClientTransport
 
 import json
 import zmq

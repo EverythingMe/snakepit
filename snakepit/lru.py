@@ -7,13 +7,12 @@ import logging; logging = logging.getLogger(__name__)
 from functools import wraps, partial
 import backports.functools_lru_cache as local_lru
 
-from snakepit.handler import BaseHandler
 from snakepit.test.test_node import LocalPool, MockServer
 from snakepit.registry import StaticRegistry
 import random
 
 
-class LRUHandler(BaseHandler):
+class LRUHandler(object):
 
     _funcs = {}
 
@@ -49,7 +48,7 @@ def init():
     port = random.randint(1,1000000)
     ep = "localhost:%d" % port
     server = MockServer(ep, __handler)
-    group = Group(server,__registry,__pool)
+    group = Group(server, __registry, __pool)
     group.start()
     _nodes.append(group)
     __node = group

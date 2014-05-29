@@ -57,7 +57,7 @@ class ZKRegistry(Registry):
         """
         self._endpoints = set(children)
         if self._userWatcher:
-            self._userWatcher(self.getEndpoints())
+            self._userWatcher(self.get_endpoints())
 
     def register(self, endpoint):
         """
