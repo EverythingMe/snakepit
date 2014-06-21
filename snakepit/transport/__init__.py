@@ -7,6 +7,14 @@ import sys
 import abc
 
 
+class TransportException(Exception):
+    pass
+
+
+class RemoteException(Exception):
+    pass
+
+
 class ServerTransport(object):
     """
     Base interface for all servers

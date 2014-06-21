@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from .. import ClientTransport
+from .. import ClientTransport, RemoteException, TransportException
 from tornado import concurrent, gen
 from trickle import Trickle
 from snakepit.group import Group
@@ -50,7 +50,7 @@ class Client(ClientTransport):
             if 'result' in msg:
                 future.set_result(msg['result'])
             elif 'exception' in msg:
-                future.set_exception(Exception(msg['exception']))
+                future.set_exception(RemoteException(msg['exception']))
             else:
                 logging.error('Response contains no `result` or `exception`: %s', msg)
 

@@ -7,7 +7,7 @@ logging = logging.getLogger(__name__)
 
 class Group(object):
     """
-    The Group is the top level object that manages everything, and is called both locally and
+    The Group is the top level object that manages everything, and is called both locally and remotely
     """
     def __init__(self, server, registry, pool, hash_func=None):
         self._pool = pool

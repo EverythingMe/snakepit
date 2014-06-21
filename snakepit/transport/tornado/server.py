@@ -3,6 +3,7 @@ from .. import ServerTransport
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
 from tornado import gen, concurrent
+from tornado.concurrent import Future
 from functools import partial
 
 import logging
@@ -29,10 +30,15 @@ class SPConnection(object):
                 args = msg['args']
                 kwargs = msg['kwargs']
             except (KeyError, ValueError):
-                log.error('Malformed response data: %s', data)
+                log.error('Malformed request data: %s', data)
                 continue
             try:
-                future = self._handler(method, *args, **kwargs)
+                res = self._handler(method, *args, **kwargs)
+                if isinstance(res, Future):
+                    future = res
+                else:
+                    future = Future()
+                    future.set_result(res)
             except Exception as e:
                 log.exception('Failed to handle request: %s', key)
                 future = concurrent.TracebackFuture()
