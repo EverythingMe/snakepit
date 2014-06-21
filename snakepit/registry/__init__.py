@@ -5,8 +5,6 @@ import logging; logging = logging.getLogger(__name__)
 __author__ = 'dvirsky'
 
 
-
-
 class Registry(object):
     def __init__(self, name):
         self._name = name
@@ -58,4 +56,3 @@ class StaticRegistry(Registry):
             raise ValueError("Not a callable!")
 
         self._watchers.add(callback)
-
