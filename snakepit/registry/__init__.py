@@ -33,6 +33,9 @@ class Registry(object):
         """
         raise NotImplementedError()
 
+    def stop(self):
+        raise NotImplementedError()
+
 
 class StaticRegistry(Registry):
     def __init__(self, name):
@@ -56,3 +59,6 @@ class StaticRegistry(Registry):
             raise ValueError("Not a callable!")
 
         self._watchers.add(callback)
+
+    def stop(self):
+        pass
