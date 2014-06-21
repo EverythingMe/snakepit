@@ -59,8 +59,8 @@ class ServerTransport(object):
             raise NotImplementedError(
                 "Don't know how to find default interface address for platform: {}".format(sys.platform))
 
-    def handle(self, callName, *args, **kwargs):
-        return getattr(self._handler, callName)(*args, **kwargs)
+    def handle(self, method, *args, **kwargs):
+        return getattr(self._handler, method)(*args, **kwargs)
 
     @abc.abstractmethod
     def listen(self):
@@ -79,5 +79,5 @@ class ClientTransport(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def call(self, callName, *args, **kwargs):
+    def call(self, method, *args, **kwargs):
         pass
