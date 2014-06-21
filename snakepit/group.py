@@ -2,6 +2,8 @@ from __future__ import absolute_import
 import logging
 import hash_ring
 
+logging = logging.getLogger(__name__)
+
 
 class Group(object):
     """

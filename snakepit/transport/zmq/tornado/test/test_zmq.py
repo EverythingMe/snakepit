@@ -33,7 +33,7 @@ class ZMQTestCase(AsyncTestCase):
             group.stop()
 
     @gen_test
-    def testEndToEnd(self):
+    def test_get_set(self):
         for i in xrange(10):
             yield self.group.do('set', 'k%d' % i, 'val%d' % i)
 

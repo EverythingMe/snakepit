@@ -29,3 +29,4 @@ class Server(ServerTransport):
                 data = socket.recv_json()
                 response = self.handle(data['callName'], *data['args'], **data['kwargs'])
                 socket.send_json(response)
+        socket.close()
