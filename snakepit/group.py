@@ -15,18 +15,18 @@ class Group(object):
         self._server = server
 
     def start(self):
-        self._registry.watch(self._onPeersChange)
+        self._registry.watch(self._on_peers_change)
         self._server.listen()
+        self._registry.register(self.local_endpoint())
         self._ring = hash_ring.HashRing(self._registry.get_endpoints())
 
     def stop(self):
         self._server.stop()
+        self._registry.stop()
 
     def _on_peers_change(self, endpoints):
         logging.info("Group %s peers changed: %s", self.local_endpoint(), endpoints)
-        self._registry.register(self.localEndpoint())
-        print "Available nodes: ", self._registry.getEndpoints()
-        self._ring = hash_ring.HashRing(self._registry.getEndpoints())
+        self._ring = hash_ring.HashRing(self._registry.get_endpoints())
 
     @staticmethod
     def hash_key(method, *args, **kwargs):
